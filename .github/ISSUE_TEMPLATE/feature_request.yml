@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement to the backend
+title: "[Feature] "
+labels:
+  - feature
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the improvement you want.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Include API, provider, deployment, or cache context if helpful.
+
