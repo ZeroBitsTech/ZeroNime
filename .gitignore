@@ -28,3 +28,5 @@ coverage.out
 .vscode/
 
 venv_ssh/
+public/
+scripts/
