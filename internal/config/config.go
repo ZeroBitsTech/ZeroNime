@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +30,10 @@ type Config struct {
 	MediaCacheDir       string
 	MediaCacheHeadBytes int64
 	MediaCacheTailBytes int64
+	PredictiveCacheEnabled   bool
+	PredictiveCacheDir       string
+	PredictiveCacheHeadBytes int64
+	PredictiveCacheTailBytes int64
 	DObjectURL          string
 	DObjectAccessKey    string
 	DObjectSecretKey    string
@@ -62,6 +67,10 @@ func Load() Config {
 		MediaCacheDir:       getenv("ANIME_MEDIA_CACHE_DIR", "./data/media-cache"),
 		MediaCacheHeadBytes: mustInt64(getenv("ANIME_MEDIA_CACHE_HEAD_BYTES", "10485760"), 10*1024*1024),
 		MediaCacheTailBytes: mustInt64(getenv("ANIME_MEDIA_CACHE_TAIL_BYTES", "2097152"), 2*1024*1024),
+		PredictiveCacheEnabled:   mustBool(getenv("ANIME_PREDICTIVE_CACHE_ENABLED", "true"), true),
+		PredictiveCacheDir:       getenv("ANIME_PREDICTIVE_CACHE_DIR", filepath.Join(os.TempDir(), "zeronime-predictive-next")),
+		PredictiveCacheHeadBytes: mustInt64(getenv("ANIME_PREDICTIVE_CACHE_HEAD_BYTES", "6291456"), 6*1024*1024),
+		PredictiveCacheTailBytes: mustInt64(getenv("ANIME_PREDICTIVE_CACHE_TAIL_BYTES", "1048576"), 1*1024*1024),
 		DObjectURL:          strings.TrimSpace(getenv("DOBJECT_URL", "")),
 		DObjectAccessKey:    strings.TrimSpace(getenv("DOBJECT_S3_ACCESS_KEY", "")),
 		DObjectSecretKey:    strings.TrimSpace(getenv("DOBJECT_S3_SECRET_KEY", "")),

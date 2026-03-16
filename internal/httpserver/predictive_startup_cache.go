@@ -13,11 +13,6 @@ import (
 	"anime/develop/backend/internal/mediacache"
 )
 
-const (
-	predictiveStartupHeadBytes int64 = 6 * 1024 * 1024
-	predictiveStartupTailBytes int64 = 1 * 1024 * 1024
-)
-
 type predictiveEpisode struct {
 	EpisodeID string
 	Candidate domain.StreamCandidate

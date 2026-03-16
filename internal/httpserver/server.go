@@ -2,8 +2,6 @@ package httpserver
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"anime/develop/backend/internal/cache"
 	"anime/develop/backend/internal/config"
@@ -60,6 +58,16 @@ func Run() error {
 	if err != nil {
 		return fmt.Errorf("configure media cache store: %w", err)
 	}
+	var predictive *predictiveStartupCache
+	if cfg.PredictiveCacheEnabled {
+		predictive = newPredictiveStartupCache(
+			cfg.PredictiveCacheDir,
+			mediaProxy,
+			cfg.PredictiveCacheHeadBytes,
+			cfg.PredictiveCacheTailBytes,
+			cfg.MediaCacheFetchTTL,
+		)
+	}
 	s := &server{
 		cfg:       cfg,
 		provider:  activeProvider.Name(),
@@ -70,13 +78,7 @@ func Run() error {
 		library:   library.New(store, activeProvider),
 		stream:    stream.New(activeProvider, memCache, store, cfg.StreamCacheTTL),
 		startup:   mediacache.New(store, blobStore, mediaProxy, cfg.MediaCacheHeadBytes, cfg.MediaCacheTailBytes, cfg.MediaCacheFetchTTL),
-		predictive: newPredictiveStartupCache(
-			filepath.Join(os.TempDir(), "zeronime-predictive-next"),
-			mediaProxy,
-			predictiveStartupHeadBytes,
-			predictiveStartupTailBytes,
-			cfg.MediaCacheFetchTTL,
-		),
+		predictive: predictive,
 		image:     imageproxy.New(cfg.RequestTimeout),
 		media:     mediaProxy,
 		mediaFetch: newMediaFetcher(memCache, mediaProxy),

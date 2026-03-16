@@ -224,6 +224,13 @@ The complete reference is in `.env.example`. The variables are grouped by respon
 - `ANIME_MEDIA_CACHE_TAIL_BYTES` — number of bytes cached from the file tail
 - `ANIME_MEDIA_CACHE_FETCH_TIMEOUT` — timeout when building startup cache from upstream
 
+### Predictive Next-Episode Cache
+
+- `ANIME_PREDICTIVE_CACHE_ENABLED` — enables or disables predictive startup caching
+- `ANIME_PREDICTIVE_CACHE_DIR` — local directory for predictive startup chunks
+- `ANIME_PREDICTIVE_CACHE_HEAD_BYTES` — head chunk size for predictive cache
+- `ANIME_PREDICTIVE_CACHE_TAIL_BYTES` — tail chunk size for predictive cache
+
 ### Optional DObject Backing Store
 
 - `DOBJECT_URL`
