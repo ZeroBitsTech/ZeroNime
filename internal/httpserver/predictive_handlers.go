@@ -48,6 +48,10 @@ func (s *server) primeStartupWindow(c *fiber.Ctx) error {
 }
 
 func (s *server) preparePredictiveWindow(clientID uint, nextEpisodeIDs []string) {
+	if s.predictive == nil || len(nextEpisodeIDs) == 0 {
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
 

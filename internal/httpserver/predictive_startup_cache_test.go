@@ -7,7 +7,9 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"anime/develop/backend/internal/domain"
 )
@@ -15,10 +17,24 @@ import (
 type predictiveTestFetcher struct {
 	contentByURL map[string][]byte
 	calls        []string
+	sleep        time.Duration
+	inFlight     atomic.Int32
+	maxInFlight  atomic.Int32
 }
 
 func (f *predictiveTestFetcher) Fetch(_ context.Context, rawURL, rangeHeader string) (*http.Response, error) {
 	f.calls = append(f.calls, fmt.Sprintf("%s|%s", rawURL, rangeHeader))
+	current := f.inFlight.Add(1)
+	defer f.inFlight.Add(-1)
+	for {
+		seen := f.maxInFlight.Load()
+		if current <= seen || f.maxInFlight.CompareAndSwap(seen, current) {
+			break
+		}
+	}
+	if f.sleep > 0 {
+		time.Sleep(f.sleep)
+	}
 	source, ok := f.contentByURL[rawURL]
 	if !ok {
 		return nil, fmt.Errorf("missing source for %s", rawURL)
@@ -101,6 +117,38 @@ func TestPredictiveStartupCacheServesNextEpisodeAndEvictsOldWindow(t *testing.T)
 		t.Fatalf("TryServeRange() third error = %v", err)
 	} else if !ok {
 		t.Fatalf("episode-3 should still be cached")
+	}
+}
+
+func TestPredictiveStartupCachePrewarmsEpisodesConcurrently(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	fetcher := &predictiveTestFetcher{
+		contentByURL: map[string][]byte{
+			"https://example.com/ep2.mp4": []byte("0123456789abcdefghijklmnopqrstuvwxyz"),
+			"https://example.com/ep3.mp4": []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
+		},
+		sleep: 40 * time.Millisecond,
+	}
+	cache := newPredictiveStartupCache(dir, fetcher, 10, 4, 0)
+
+	err := cache.UpdateWindow(context.Background(), 7, []predictiveEpisode{
+		{
+			EpisodeID: "episode-2",
+			Candidate: domain.StreamCandidate{URL: "https://example.com/ep2.mp4", Container: "mp4", Quality: "720p", IsDirect: true, Playable: true},
+		},
+		{
+			EpisodeID: "episode-3",
+			Candidate: domain.StreamCandidate{URL: "https://example.com/ep3.mp4", Container: "mp4", Quality: "720p", IsDirect: true, Playable: true},
+		},
+	})
+	if err != nil {
+		t.Fatalf("UpdateWindow() error = %v", err)
+	}
+
+	if got := fetcher.maxInFlight.Load(); got < 2 {
+		t.Fatalf("max concurrent fetches = %d, want at least 2", got)
 	}
 }
 

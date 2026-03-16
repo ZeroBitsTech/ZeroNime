@@ -173,11 +173,23 @@ func (c *predictiveStartupCache) UpdateWindow(ctx context.Context, clientID uint
 	c.mu.Unlock()
 
 	var firstErr error
+	var errMu sync.Mutex
+	var wg sync.WaitGroup
 	for _, episode := range normalized {
-		if err := c.service.Prewarm(ctx, episode.EpisodeID, episode.Candidate); err != nil && firstErr == nil {
-			firstErr = err
-		}
+		episode := episode
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := c.service.Prewarm(ctx, episode.EpisodeID, episode.Candidate); err != nil {
+				errMu.Lock()
+				if firstErr == nil {
+					firstErr = err
+				}
+				errMu.Unlock()
+			}
+		}()
 	}
+	wg.Wait()
 
 	c.pruneInactive()
 	return firstErr
