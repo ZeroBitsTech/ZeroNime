@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZeroNime — Test Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #070a12;
+            --bg2: #0d1117;
+            --surface: #161b27;
+            --surface2: #1c2333;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent2: #1f6feb;
+            --green: #3fb950;
+            --red: #f85149;
+            --yellow: #d29922;
+            --text: #e6edf3;
+            --text2: #8b949e;
+            --text3: #484f58;
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg2); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* NAV */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(7,10,18,0.88);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #58a6ff, #79c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text2);
+            border: none;
+            background: transparent;
+            transition: all 0.15s;
+        }
+        .nav-tab:hover { color: var(--text); background: var(--surface); }
+        .nav-tab.active { color: var(--accent); background: rgba(88,166,255,0.12); }
+
+        .search-form {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 7px 14px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-family: inherit;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        input[type="text"]:focus { border-color: var(--accent); }
+
+        .btn {
+            padding: 7px 16px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .btn-primary { background: var(--accent2); color: white; }
+        .btn-primary:hover { background: var(--accent); }
+        .btn-ghost { background: var(--surface); color: var(--text2); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+        /* MAIN */
+        main { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 16px;
+        }
+
+        /* GRID */
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(88,166,255,0.12);
+        }
+
+        .card-poster {
+            position: relative;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+            background: var(--surface2);
+        }
+
+        .card-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .card:hover .card-poster img { transform: scale(1.05); }
+
+        .card-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(7,10,18,0.8);
+            backdrop-filter: blur(4px);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--green);
+            border: 1px solid rgba(63,185,80,0.3);
+        }
+
+        .card-ep-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(88,166,255,0.9);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #070a12;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: var(--text);
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-top: 4px;
+        }
+
+        /* SKELETON */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius);
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        .skel-card {
+            border-radius: var(--radius-lg);
+            aspect-ratio: 2/3;
+        }
+
+        /* MODAL */
+        #detail-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(7,10,18,0.92);
+            backdrop-filter: blur(16px);
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .modal-inner {
+            max-width: 920px;
+            margin: 0 auto;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text2);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            z-index: 10;
+        }
+        .modal-close:hover { color: var(--text); border-color: var(--accent); }
+
+        /* HERO BANNER */
+        .detail-hero {
+            position: relative;
+            height: 240px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .detail-hero-bg {
+            position: absolute;
+            inset: -10px;
+            background-size: cover;
+            background-position: center top;
+            filter: blur(20px) brightness(0.3);
+        }
+        .detail-hero-content {
+            position: absolute;
+            bottom: 20px;
+            left: 24px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .detail-poster {
+            width: 110px;
+            height: 158px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .detail-title-block h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .detail-meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .meta-tag {
+            background: rgba(88,166,255,0.12);
+            border: 1px solid rgba(88,166,255,0.25);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* DETAIL BODY */
+        .detail-body { padding: 24px; }
+
+        .synopsis {
+            font-size: 0.875rem;
+            color: var(--text2);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.15s;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* EPISODE LIST */
+        .ep-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .ep-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--text2);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ep-btn:hover {
+            background: var(--surface2);
+            border-color: var(--accent);
+            color: var(--text);
+        }
+        .ep-btn.active {
+            background: rgba(88,166,255,0.12);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* PLAYER */
+        #player-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .player-wrap {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: black;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .player-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .player-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            font-size: 0.875rem;
+            color: var(--text2);
+        }
+
+        /* QUALITY SELECTOR */
+        .quality-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        .quality-label {
+            font-size: 0.75rem;
+            color: var(--text2);
+            font-weight: 500;
+        }
+
+        .q-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 0.775rem;
+            font-weight: 600;
+            font-family: inherit;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .q-btn:hover { border-color: var(--accent); color: var(--text); }
+        .q-btn.active {
+            background: var(--accent2);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* FEED */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            gap: 12px;
+            color: var(--text2);
+            font-size: 0.875rem;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* STATUS BAR */
+        #status-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            color: var(--text2);
+            display: none;
+            gap: 8px;
+            align-items: center;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        #status-bar.show { display: flex; }
+        #status-bar.ok { color: var(--green); border-color: rgba(63,185,80,0.3); }
+        #status-bar.err { color: var(--red); border-color: rgba(248,81,73,0.3); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="logo">ZeroNime</span>
+    <div class="nav-tabs">
+        <button class="nav-tab active" id="tab-ongoing" onclick="switchTab('ongoing')">Ongoing</button>
+        <button class="nav-tab" id="tab-completed" onclick="switchTab('completed')">Completed</button>
+        <button class="nav-tab" id="tab-movies" onclick="switchTab('movies')">Movies</button>
+    </div>
+    <form class="search-form" onsubmit="doSearch(event)">
+        <input type="text" id="q" placeholder="Search anime..." autocomplete="off">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+</nav>
+
+<main>
+    <div id="section-label" class="section-title"></div>
+    <div id="grid-root"></div>
+</main>
+
+<!-- DETAIL MODAL -->
+<div id="detail-modal">
+    <div class="modal-inner">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div id="modal-hero" class="detail-hero"></div>
+        <div class="detail-body">
+            <p id="modal-synopsis" class="synopsis"></p>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('episodes')">Episodes</button>
+                <button class="tab-btn" onclick="showTab('info')">Info</button>
+            </div>
+            <div id="tab-episodes">
+                <div id="ep-grid" class="ep-grid"></div>
+            </div>
+            <div id="tab-info" style="display:none; font-size:0.875rem; color:var(--text2); line-height:1.8;"></div>
+
+            <div id="player-section">
+                <div class="player-wrap">
+                    <div id="player-overlay" class="player-overlay">
+                        <span>Select an episode to start watching</span>
+                    </div>
+                    <iframe id="player-frame" src="about:blank" allowfullscreen allow="autoplay; fullscreen"></iframe>
+                </div>
+                <div class="quality-row">
+                    <span class="quality-label">Source:</span>
+                    <div id="quality-btns"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="status-bar"><span class="spinner"></span><span id="status-msg">Loading…</span></div>
+
+<script>
+/* ================================
+   CONFIG
+================================ */
+const BASE_URL   = 'http://localhost:8080';
+const DEVICE_ID  = 'auto-fa2044cb9c7fd0265cf3961b7456008c';
+const SECRET     = 'aa957cb811498fb7ea0ab4ba28bede795eb36a957418390c88ebc153d320508e';
+
+/* ================================
+   HMAC-SHA256 (pure JS — crypto.subtle)
+================================ */
+async function hmacSign(message, secret) {
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+    return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function authFetch(path, opts = {}) {
+    const ts    = Math.floor(Date.now() / 1000).toString();
+    const nonce = Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b => b.toString(16).padStart(2,'0')).join('');
+    const method = (opts.method || 'GET').toUpperCase();
+    const payload = [method, path, ts, DEVICE_ID, nonce].join('\n');
+    const sig = await hmacSign(payload, SECRET);
+    
+    const headers = {
+        'X-Device-ID': DEVICE_ID,
+        'X-Timestamp': ts,
+        'X-Nonce': nonce,
+        'X-Signature': sig,
+        ...(opts.headers || {})
+    };
+    
+    return fetch(BASE_URL + path, { ...opts, headers });
+}
+
+/* ================================
+   IMAGE PROXY 
+================================ */
+function imgProxy(url) {
+    if (!url) return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="150"%3E%3Crect fill="%231c2333" width="100" height="150"/%3E%3C/svg%3E';
+    return `${BASE_URL}/v1/image?url=${encodeURIComponent(url)}`;
+}
+
+/* ================================
+   STATUS BAR
+================================ */
+let statusTimeout;
+function showStatus(msg, type = '') {
+    const bar = document.getElementById('status-bar');
+    bar.className = 'show ' + type;
+    document.getElementById('status-msg').textContent = msg;
+    clearTimeout(statusTimeout);
+    if (type === 'ok' || type === 'err') {
+        statusTimeout = setTimeout(() => bar.classList.remove('show'), 3000);
+    }
+}
+function hideStatus() {
+    document.getElementById('status-bar').classList.remove('show');
+}
+
+/* ================================
+   RENDER
+================================ */
+function renderGrid(items) {
+    const root = document.getElementById('grid-root');
+    if (!items || items.length === 0) {
+        root.innerHTML = '<div class="loading-spinner" style="height:160px">No results found.</div>';
+        return;
+    }
+
+    root.innerHTML = `<div class="anime-grid">${items.map(item => {
+        const title = item.judul || item.anime_name || item.title || '—';
+        const url   = item.url  || item.link  || '';
+        const cover = item.cover || item.thumb || '';
+        const ep    = item.lastch || item.episodes || '';
+        const type  = item.type  || '';
+        return `<div class="card" onclick="openDetail('${escHtml(url)}')" title="${escHtml(title)}">
+            <div class="card-poster">
+                <img src="${imgProxy(cover)}" alt="${escHtml(title)}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22300%22%3E%3Crect fill=%22%231c2333%22 width=%22200%22 height=%22300%22/%3E%3C/svg%3E'">
+                ${type ? `<span class="card-badge">${escHtml(type)}</span>` : ''}
+                ${ep ? `<span class="card-ep-badge">${escHtml(ep)}</span>` : ''}
+            </div>
+            <div class="card-body">
+                <div class="card-title">${escHtml(title)}</div>
+                ${item.lastup ? `<div class="card-sub">${escHtml(item.lastup)}</div>` : ''}
+            </div>
+        </div>`;
+    }).join('')}</div>`;
+}
+
+function renderSkeletons(n = 12) {
+    const root = document.getElementById('grid-root');
+    root.innerHTML = `<div class="anime-grid">${Array(n).fill(0).map(() => `<div class="card"><div class="card-poster skeleton skel-card"></div><div class="card-body"><div class="skeleton" style="height:14px;width:80%;margin-bottom:6px;"></div><div class="skeleton" style="height:11px;width:50%;"></div></div></div>`).join('')}</div>`;
+}
+
+/* ================================
+   TABS
+================================ */
+let currentTab = 'ongoing';
+async function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab)?.classList.add('active');
+
+    const labels = { ongoing: 'Ongoing Anime', completed: 'Completed', movies: 'Movies' };
+    document.getElementById('section-label').textContent = labels[tab] || '';
+    renderSkeletons();
+    showStatus('Loading…');
+
+    try {
+        let path;
+        if (tab === 'ongoing')   path = '/v1/ongoing?page=1';
+        if (tab === 'completed') path = '/v1/baru-upload?page=1';
+        if (tab === 'movies')    path = '/v1/movie';
+
+        const res  = await authFetch(path);
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.data?.animeList || data.data || data);
+        renderGrid(Array.isArray(items) ? items : []);
+        showStatus(`${Array.isArray(items)?items.length:0} items loaded`, 'ok');
+    } catch(e) {
+        document.getElementById('grid-root').innerHTML = `<div class="loading-spinner">${e.message}</div>`;
+        showStatus('Failed to load: ' + e.message, 'err');
+    }
+}
+
+/* ================================
+   SEARCH
+================================ */
+async function doSearch(e) {
+    e.preventDefault();
+    const q = document.getElementById('q').value.trim();
+    if (!q) return;
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-label').textContent = `Search: "${q}"`;
+    renderSkeletons(8);
+    showStatus('Searching…');
+    try {
+        const res  = await authFetch('/v1/search?keyword=' + encodeURIComponent(q));
+        const data = await res.json();
+        const results = data?.data?.[0]?.result || data?.data || [];
+        renderGrid(results);
+        showStatus(`${results.length} results for "${q}"`, 'ok');
+    } catch(e) {
+        showStatus('Search failed: ' + e.message, 'err');
+    }
+}
+
+/* ================================
+   DETAIL MODAL
+================================ */
+let currentEpUrl = null;
+
+async function openDetail(animeUrl) {
+    const modal = document.getElementById('detail-modal');
+    modal.style.display = 'block';
+    document.getElementById('modal-hero').innerHTML = '<div style="height:240px" class="skeleton"></div>';
+    document.getElementById('modal-synopsis').textContent = '';
+    document.getElementById('ep-grid').innerHTML = '<div class="loading-spinner" style="height:120px"><div class="spinner"></div> Loading…</div>';
+    document.getElementById('player-section').style.display = 'none';
+    showStatus('Loading detail…');
+    
+    try {
+        const res  = await authFetch('/v1/detail/' + encodeURIComponent(animeUrl));
+        const data = await res.json();
+        const row  = (data?.data || [])[0] || {};
+
+        const title   = row.judul || row.anime_name || '—';
+        const cover   = row.cover || row.thumb || '';
+        const sinopsis = (row.sinopsis || '').trim() || 'Tidak ada sinopsis.';
+        const genres  = row.genre || [];
+        const type    = row.type  || '';
+        const status  = row.status || '';
+        const eps     = row.chapter || row.episodes || [];
+
+        // Hero
+        document.getElementById('modal-hero').innerHTML = `
+            <div class="detail-hero-bg" style="background-image:url(${imgProxy(cover)})"></div>
+            <div class="detail-hero-content">
+                <img class="detail-poster" src="${imgProxy(cover)}" alt="${escHtml(title)}" onerror="this.style.background='var(--surface2)'">
+                <div class="detail-title-block">
+                    <h2>${escHtml(title)}</h2>
+                    <div class="detail-meta-tags">
+                        ${type ? `<span class="meta-tag">${escHtml(type)}</span>` : ''}
+                        ${status ? `<span class="meta-tag">${escHtml(status)}</span>` : ''}
+                        ${genres.slice(0,4).map(g => `<span class="meta-tag">${escHtml(typeof g==='object'?g.title:g)}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('modal-synopsis').textContent = sinopsis;
+
+        // Info tab
+        const infoLines = [
+            row.judul && `<b>Judul:</b> ${escHtml(row.judul)}`,
+            row.type && `<b>Tipe:</b> ${escHtml(row.type)}`,
+            row.status && `<b>Status:</b> ${escHtml(row.status)}`,
+            row.rilis && `<b>Rilis:</b> ${escHtml(row.rilis)}`,
+            row.durasi && `<b>Durasi:</b> ${escHtml(row.durasi)}`,
+        ].filter(Boolean).join('<br>');
+        document.getElementById('tab-info').innerHTML = infoLines || 'No info.';
+
+        // Episodes
+        document.getElementById('ep-grid').innerHTML = eps.length ? eps.map((ep, i) => {
+            const eid = ep.url || ep.link;
+            const epNum = ep.ch || (i+1);
+            return `<button class="ep-btn" id="ep-${escHtml(eid)}" onclick="loadEpisode('${escHtml(eid)}')" title="${ep.date||''}">Ep ${epNum}</button>`;
+        }).join('') : '<p style="color:var(--text2);font-size:0.85rem">Tidak ada episode ditemukan.</p>';
+
+        showStatus(`${eps.length} episodes`, 'ok');
+    } catch(e) {
+        document.getElementById('ep-grid').innerHTML = `<p style="color:var(--red)">Error: ${e.message}</p>`;
+        showStatus('Detail load failed', 'err');
+    }
+}
+
+function closeModal() {
+    document.getElementById('detail-modal').style.display = 'none';
+    document.getElementById('player-frame').src = 'about:blank';
+}
+
+/* ================================
+   EPISODE + STREAM
+================================ */
+async function loadEpisode(epUrl) {
+    // Mark active ep
+    document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('ep-' + epUrl)?.classList.add('active');
+    
+    currentEpUrl = epUrl;
+    const playerSection = document.getElementById('player-section');
+    playerSection.style.display = 'block';
+    playerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    document.getElementById('player-overlay').style.display = 'flex';
+    document.getElementById('player-overlay').innerHTML = '<div class="spinner"></div><span>Loading streams…</span>';
+    document.getElementById('player-frame').src = 'about:blank';
+    document.getElementById('quality-btns').innerHTML = '';
+    showStatus('Loading episode streams…');
+
+    try {
+        const res  = await authFetch('/v1/stream/' + encodeURIComponent(epUrl));
+        const data = await res.json();
+        const row  = (data?.data || [])[0] || {};
+        const streams = row.streams || {};
+
+        const allLinks = [];
+        for (const [q, links] of Object.entries(streams)) {
+            if (Array.isArray(links)) {
+                links.filter(l => l.validated).forEach(l => {
+                    allLinks.push({ label: q, link: l.link, size: l.size || '' });
+                });
+            }
+        }
+
+        if (allLinks.length === 0) {
+            document.getElementById('player-overlay').innerHTML = '<span style="color:var(--red)">No valid streams found.</span>';
+            showStatus('No streams available', 'err');
+            return;
+        }
+
+        // Sort by quality desc
+        const qOrder = {'1080p':5,'720p':4,'480p':3,'360p':2,'240p':1};
+        allLinks.sort((a,b) => (qOrder[b.label]||0) - (qOrder[a.label]||0));
+
+        // Render quality buttons
+        document.getElementById('quality-btns').innerHTML = allLinks.map((l, i) =>
+            `<button class="q-btn${i===0?' active':''}" onclick="switchStream('${escHtml(l.link)}', this)">${escHtml(l.label)}</button>`
+        ).join('');
+
+        // Play first
+        switchStream(allLinks[0].link, document.querySelector('.q-btn'));
+        showStatus(`${allLinks.length} streams loaded`, 'ok');
+    } catch(e) {
+        document.getElementById('player-overlay').innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
+        showStatus('Stream load failed: ' + e.message, 'err');
+    }
+}
+
+function switchStream(url, btn) {
+    document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
+    btn?.classList.add('active');
+    
+    const overlay = document.getElementById('player-overlay');
+    const frame   = document.getElementById('player-frame');
+    overlay.style.display = 'none';
+    frame.src = url;
+}
+
+/* ================================
+   TAB SWITCHING (episode / info)
+================================ */
+function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-episodes').style.display = name === 'episodes' ? 'block' : 'none';
+    document.getElementById('tab-info').style.display      = name === 'info'     ? 'block' : 'none';
+}
+
+/* ================================
+   UTIL
+================================ */
+function escHtml(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ================================
+   INIT
+================================ */
+switchTab('ongoing');
+</script>
+</body>
+</html>

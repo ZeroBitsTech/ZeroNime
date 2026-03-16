@@ -1,0 +1,82 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: anime-db
+    restart: always
+    environment:
+      POSTGRES_USER: zeronime
+      POSTGRES_PASSWORD: zeronime@123
+      POSTGRES_DB: animedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zeronime -d animedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: anime-redis
+    restart: always
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anime-backend
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgres://zeronime:zeronime%40123@db:5432/animedb?sslmode=disable
+      REDIS_ADDR: redis:6379
+      ANIME_ACTIVE_PROVIDER: kuramanime
+      ANIME_BROWSER_PATH: /usr/bin/chromium-browser
+      OTAKUDESU_BASE_URL: https://otakudesu.blog
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./var/media-cache:/app/var/media-cache
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: anime-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy:/data
+      - ./config/caddy:/config
+    depends_on:
+      backend:
+        condition: service_started
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: anime-redis-insight
+    restart: always
+    ports:
+      - "5540:5540"
+    depends_on:
+      redis:
+        condition: service_healthy

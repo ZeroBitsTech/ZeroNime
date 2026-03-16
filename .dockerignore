@@ -1,0 +1,12 @@
+.git
+.gitignore
+README.md
+scripts
+.env
+tmp
+data
+var/media-cache
+venv_ssh
+config
+server
+*.md

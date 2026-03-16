@@ -1,0 +1,65 @@
+# Local-only compose (no Caddy, no reverse proxy)
+# Port 8080 exposed directly for testing
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: anime-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zeronime
+      POSTGRES_PASSWORD: zeronime@123
+      POSTGRES_DB: animedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - anime_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zeronime -d animedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: anime-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - anime_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anime-backend
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgres://zeronime:zeronime%40123@db:5432/animedb?sslmode=disable
+      REDIS_ADDR: redis:6379
+      ANIME_LISTEN_ADDR: :8080
+      ANIME_ACTIVE_PROVIDER: kuramanime
+      ANIME_BROWSER_PATH: /usr/bin/chromium-browser
+      OTAKUDESU_BASE_URL: https://otakudesu.blog
+    ports:
+      - "0.0.0.0:8080:8080"
+    volumes:
+      - ./var/media-cache:/app/var/media-cache
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  anime_db_data:
+  anime_redis_data:
